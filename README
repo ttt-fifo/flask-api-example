@@ -1,0 +1,22 @@
+Flask API Example Skeleton
+
+Build API endpoints:
+
+    1) Providers with data:
+        - Name
+        - Email
+        - Phone Number
+        - Language
+        - Currency
+
+    2) Service areas of business operation for the providers:
+        - name of the area
+        - related provider
+        - price in this area (to compare with the other prices)
+        - polygon of the area
+
+    3) Prices query endpoint:
+        - by given latitude, longitude
+        - return all polygons, containing this point
+
+Deploy the code to Docker.
