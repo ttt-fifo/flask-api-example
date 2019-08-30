@@ -1,49 +1,12 @@
 #!/bin/env python3
 from flask import Flask
-import sqlite3
-from flask import g
 from flask import jsonify
 from flask import request
+from flask_sqlite3 import SQLite3
 
 app = Flask(__name__)
-
-
-class Connection(sqlite3.Connection):
-
-    def all(self, query, args=()):
-        cur = self.execute(query, args)
-        while True:
-            row = cur.fetchone()
-            if not row:
-                break
-            yield row
-        cur.close()
-
-    def one(self, query, args=()):
-        cur = self.execute(query, args)
-        rv = cur.fetchall()
-        cur.close()
-        if rv:
-            return rv[0]
-        return None
-
-
-DATABASE = 'db.sqlite3'
-
-
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE, factory=Connection)
-        db.row_factory = sqlite3.Row
-    return db
-
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+app.config.from_object('config.Config')
+db = SQLite3(app)
 
 
 @app.route('/')
@@ -53,9 +16,8 @@ def help():
 
 @app.route('/providers', methods=['GET'])
 def list():
-    db = get_db()
     q = "select id, name, email, phonenumber, language, currency from provider"
-    return jsonify([dict(p) for p in db.all(q)])
+    return jsonify([dict(p) for p in db.con.all(q)])
 
 
 @app.route('/providers', methods=['POST'])
@@ -66,9 +28,8 @@ values(?, ?, ?, ?, ?)
     arg = (request.json['name'], request.json['email'],
            request.json['phonenumber'], request.json['language'],
            request.json['currency'])
-    db = get_db()
-    db.execute(q, arg)
-    db.commit()
+    db.con.execute(q, arg)
+    db.con.commit()
     return "OK"
 
 
