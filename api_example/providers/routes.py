@@ -1,27 +1,17 @@
-#!/bin/env python3
-from flask import Flask
 from flask import jsonify
 from flask import request
-from flask_sqlite3 import SQLite3
-
-app = Flask(__name__)
-app.config.from_object('config.Config')
-db = SQLite3(app)
-
-
-@app.route('/')
-def help():
-    return 'HELP'
+from app import app
+from app import db
 
 
 @app.route('/providers', methods=['GET'])
-def list():
+def list_providers():
     q = "select id, name, email, phonenumber, language, currency from provider"
     return jsonify([dict(p) for p in db.con.all(q)])
 
 
 @app.route('/providers', methods=['POST'])
-def create():
+def create_provider():
     q = """insert into provider(name, email, phonenumber, language, currency)
 values(?, ?, ?, ?, ?)
 """
@@ -31,7 +21,3 @@ values(?, ?, ?, ?, ?)
     db.con.execute(q, arg)
     db.con.commit()
     return "OK"
-
-
-if __name__ == '__main__':
-    app.run()
