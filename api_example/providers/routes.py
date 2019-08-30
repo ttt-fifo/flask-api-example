@@ -1,23 +1,34 @@
-from flask import jsonify
-from flask import request
-from app import app
-from app import db
+from flask_restplus import Resource
+from app import api
+from . import models
+
+provider_ns = api.namespace('providers', description='Providers Manipulation')
 
 
-@app.route('/providers', methods=['GET'])
-def list_providers():
-    q = "select id, name, email, phonenumber, language, currency from provider"
-    return jsonify([p for p in db.con.all(q)])
+@provider_ns.route("/")
+class ProviderList(Resource):
+
+    def get(self):
+        """
+        Returns the list of providers
+        """
+        return models.provider_list()
+
+    def post(self):
+        """
+        Adds a new provider to the list
+        """
 
 
-@app.route('/providers', methods=['POST'])
-def create_provider():
-    q = """insert into provider(name, email, phonenumber, language, currency)
-values(?, ?, ?, ?, ?)
-"""
-    arg = (request.json['name'], request.json['email'],
-           request.json['phonenumber'], request.json['language'],
-           request.json['currency'])
-    db.con.execute(q, arg)
-    db.con.commit()
-    return "OK"
+@provider_ns.route("/<int:id>")
+class Provider(Resource):
+
+    def get(self, id):
+        """
+        Displays the provider detail
+        """
+
+    def put(self, id):
+        """
+        Edits the selected provider
+        """

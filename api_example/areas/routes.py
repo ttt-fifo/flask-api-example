@@ -1,10 +1,19 @@
-from flask import jsonify
-# from flask import request
-from app import app
-from app import db
+from app import api
+# from app import db
+from flask_restplus import Resource
+
+area_ns = api.namespace('areas', description='Areas Manipulation')
 
 
-@app.route('/areas', methods=['GET'])
-def list_areas():
-    q = "select name, price, geom from area"
-    return jsonify([p for p in db.con.all(q)])
+@area_ns.route("/")
+class AreaList(Resource):
+
+    def get(self):
+        """
+        Returns the list of areas
+        """
+
+    def post(self):
+        """
+        Adds a new area to the list
+        """
