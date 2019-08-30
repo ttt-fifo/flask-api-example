@@ -21,6 +21,11 @@ class ExtendedConnection(sqlite3.Connection):
             return rv[0]
         return None
 
+    def enable_spatialite(self):
+        self.enable_load_extension(True)
+        self.execute('SELECT load_extension("mod_spatialite.so")')
+        # self.execute('SELECT InitSpatialMetaData(1);')
+
 
 def make_dicts(cursor, row):
     return dict((cursor.description[idx][0], value)
