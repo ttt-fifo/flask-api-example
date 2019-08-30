@@ -7,7 +7,7 @@ from app import db
 @app.route('/providers', methods=['GET'])
 def list_providers():
     q = "select id, name, email, phonenumber, language, currency from provider"
-    return jsonify([dict(p) for p in db.con.all(q)])
+    return jsonify([p for p in db.con.all(q)])
 
 
 @app.route('/providers', methods=['POST'])

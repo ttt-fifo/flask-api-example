@@ -22,6 +22,11 @@ class ExtendedConnection(sqlite3.Connection):
         return None
 
 
+def make_dicts(cursor, row):
+    return dict((cursor.description[idx][0], value)
+                for idx, value in enumerate(row))
+
+
 class SQLite3(object):
     def __init__(self, app=None):
         self.app = app
@@ -35,7 +40,7 @@ class SQLite3(object):
     def connect(self):
         con = sqlite3.connect(current_app.config['SQLITE3_DATABASE'],
                               factory=ExtendedConnection)
-        con.row_factory = sqlite3.Row
+        con.row_factory = make_dicts
         return con
 
     def teardown(self, exception):
