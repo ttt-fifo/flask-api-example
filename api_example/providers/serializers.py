@@ -17,7 +17,7 @@ class Provider:
     def __init__(self):
         self.get = api.model('ProviderGet', provider_fields)
 
-        provider_fields_add = deepcopy(provider_fields)
-        del provider_fields_add['id']
+        provider_fields_edit = deepcopy(provider_fields)
+        del provider_fields_edit['id']
         self.edit = api.model('ProviderEdit',
-                              provider_fields_add)
+                              provider_fields_edit)
