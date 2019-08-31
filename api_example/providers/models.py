@@ -5,12 +5,12 @@ class Provider:
 
     def all(self):
         q = """select id, name, email,
-               phonenumber, language, currency from provider"""
+               phone, language, currency from provider"""
         return [prov for prov in db.con.all(q)]
 
     def insert(self, arg=()):
         q = """
-insert into provider(name, email, phonenumber, language, currency)
+insert into provider(name, email, phone, language, currency)
 values (?, ?, ?, ?, ?)"""
         cur = db.con.cursor()
         cur.execute(q, arg)
@@ -20,14 +20,14 @@ values (?, ?, ?, ?, ?)"""
         return result
 
     def one(self, args=()):
-        q = """select id, name, email, phonenumber, language, currency
+        q = """select id, name, email, phone, language, currency
 from provider
 where id = ?"""
         return db.con.one(q, args)
 
     def update(self, arg=()):
         q = """
-update provider set name=?, email=?, phonenumber=?, language=?, currency=?
+update provider set name=?, email=?, phone=?, language=?, currency=?
 where id = ?"""
         cur = db.con.cursor()
         cur.execute(q, arg)

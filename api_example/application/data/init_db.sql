@@ -9,11 +9,13 @@ CREATE TABLE language (
 
 CREATE TABLE provider (
     id INTEGER PRIMARY KEY,
-    name TEXT,
-    email TEXT,
-    phonenumber TEXT,
-    language TEXT,
-    currency TEXT
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    language INTEGER,
+    currency TEXT,
+    UNIQUE(name),
+    FOREIGN KEY(language) REFERENCES language(id)
 );
 
 CREATE TABLE area (

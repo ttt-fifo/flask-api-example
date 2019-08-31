@@ -1,5 +1,5 @@
 #!/bin/env python3
-from app import app
+from application import app
 import providers.routes
 import areas.routes
 

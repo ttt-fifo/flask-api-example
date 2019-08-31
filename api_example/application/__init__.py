@@ -1,5 +1,5 @@
 from flask import Flask
-from .extensions.flask_sqlite3 import SQLite3
+from .lib.flask_extensions.flask_sqlite3 import SQLite3
 from .config import Config
 from flask_restplus import Api
 
