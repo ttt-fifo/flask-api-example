@@ -1,17 +1,17 @@
-from application import db
+from core import db
 
 
 class Provider:
 
     def all(self):
-        q = """select id, name, email,
-               phone, language, currency from provider"""
-        return [prov for prov in db.con.all(q)]
+        q = """SELECT id, name, email,
+               phone, language, currency FROM provider"""
+        return db.con.all(q)
 
     def insert(self, arg=()):
         q = """
-insert into provider(name, email, phone, language, currency)
-values (?, ?, ?, ?, ?)"""
+INSERT INTO provider(name, email, phone, language, currency)
+VALUES (?, ?, ?, ?, ?)"""
         cur = db.con.cursor()
         cur.execute(q, arg)
         result = cur.lastrowid
@@ -20,15 +20,15 @@ values (?, ?, ?, ?, ?)"""
         return result
 
     def one(self, args=()):
-        q = """select id, name, email, phone, language, currency
-from provider
-where id = ?"""
+        q = """SELECT id, name, email, phone, language, currency
+FROM provider
+WHERE id = ?"""
         return db.con.one(q, args)
 
     def update(self, arg=()):
         q = """
-update provider set name=?, email=?, phone=?, language=?, currency=?
-where id = ?"""
+UPDATE provider SET name=?, email=?, phone=?, language=?, currency=?
+WHERE id = ?"""
         cur = db.con.cursor()
         cur.execute(q, arg)
         result = cur.lastrowid

@@ -1,17 +1,16 @@
 from flask_restplus import Resource
-from application import api
-from application.lib.validators import validate_with
+from core.lib.validators import validate_with
+from .namespaces import api
 from . import models
 from . import validators
 from .marshallers import provider_get_marsh
 from .marshallers import provider_edit_marsh
 
-provider_ns = api.namespace('providers', description='Providers Manipulation')
 provider_mod = models.Provider()
 provider_val = validators.Provider()
 
 
-@provider_ns.route("/")
+@api.route("/")
 class ProviderList(Resource):
 
     @api.marshal_list_with(provider_get_marsh)
@@ -19,11 +18,11 @@ class ProviderList(Resource):
         """
         Returns the list of providers
         """
-        return provider_mod.all()
+        return [provider for provider in provider_mod.all()]
 
     @api.expect(provider_edit_marsh, validate=True)
     @api.marshal_with(provider_get_marsh)
-    @validate_with(provider_val)
+    @validate_with(api, provider_val)
     def post(self):
         """
         Adds a new provider to the list
@@ -33,12 +32,12 @@ class ProviderList(Resource):
                 api.payload['phone'],
                 api.payload['language'],
                 api.payload['currency'])
-        provider_id = provider_mod.insert(args)
-        api.payload['id'] = provider_id
+        id = provider_mod.insert(args)
+        api.payload['id'] = id
         return api.payload
 
 
-@provider_ns.route("/<int:id>")
+@api.route("/<int:id>")
 class Provider(Resource):
 
     @api.marshal_with(provider_get_marsh)
@@ -50,7 +49,7 @@ class Provider(Resource):
 
     @api.expect(provider_edit_marsh, validate=True)
     @api.marshal_with(provider_get_marsh)
-    @validate_with(provider_val)
+    @validate_with(api, provider_val)
     def put(self, id):
         """
         Edits the selected provider
@@ -62,4 +61,5 @@ class Provider(Resource):
                 api.payload['currency'],
                 id)
         provider_mod.update(args)
+        api.payload['id'] = id
         return api.payload
