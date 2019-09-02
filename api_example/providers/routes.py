@@ -1,41 +1,39 @@
 from flask_restplus import Resource
-from flask import abort
-from app import api
+from application import api
+from application.lib.validators import validate_with
 from . import models
-from . import serializers
+from . import validators
+from .marshallers import provider_get_marsh
+from .marshallers import provider_edit_marsh
 
 provider_ns = api.namespace('providers', description='Providers Manipulation')
-provider_serializer = serializers.Provider()
-provider_model = models.Provider()
+provider_mod = models.Provider()
+provider_val = validators.Provider()
 
 
 @provider_ns.route("/")
 class ProviderList(Resource):
 
-    @api.marshal_list_with(provider_serializer.get)
+    @api.marshal_list_with(provider_get_marsh)
     def get(self):
         """
         Returns the list of providers
         """
-        return provider_model.all()
+        return provider_mod.all()
 
-    @api.expect(provider_serializer.edit, validate=True)
-    @api.marshal_with(provider_serializer.get)
+    @api.expect(provider_edit_marsh, validate=True)
+    @api.marshal_with(provider_get_marsh)
+    @validate_with(provider_val)
     def post(self):
         """
         Adds a new provider to the list
         """
-        try:
-            provider_serializer.validate_edit(api.payload)
-        except Exception as e:
-            abort(400, str(e))
-
         args = (api.payload['name'],
                 api.payload['email'],
                 api.payload['phone'],
                 api.payload['language'],
                 api.payload['currency'])
-        provider_id = provider_model.insert(args)
+        provider_id = provider_mod.insert(args)
         api.payload['id'] = provider_id
         return api.payload
 
@@ -43,29 +41,25 @@ class ProviderList(Resource):
 @provider_ns.route("/<int:id>")
 class Provider(Resource):
 
-    @api.marshal_with(provider_serializer.get)
+    @api.marshal_with(provider_get_marsh)
     def get(self, id):
         """
         Displays the provider detail
         """
-        return provider_model.one(args=(id,))
+        return provider_mod.one(args=(id,))
 
-    @api.expect(provider_serializer.edit, validate=True)
-    @api.marshal_with(provider_serializer.get)
+    @api.expect(provider_edit_marsh, validate=True)
+    @api.marshal_with(provider_get_marsh)
+    @validate_with(provider_val)
     def put(self, id):
         """
         Edits the selected provider
         """
-        try:
-            provider_serializer.validate_edit(api.payload)
-        except Exception as e:
-            abort(400, str(e))
-
         args = (api.payload['name'],
                 api.payload['email'],
                 api.payload['phone'],
                 api.payload['language'],
                 api.payload['currency'],
-                api.payload['id'])
-        provider_model.update(args)
+                id)
+        provider_mod.update(args)
         return api.payload
