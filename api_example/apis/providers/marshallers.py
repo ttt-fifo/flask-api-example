@@ -1,11 +1,18 @@
-from .namespaces import api
+"""
+Marshallers for the current endpoint
+"""
+from copy import deepcopy
 from flask_restplus import fields
+from .namespaces import api
 
+# provider marshaller constructoin
 provider_fields = {}
-provider_fields['id'] = fields.Integer()
+provider_fields['id'] = fields.Integer(description='Provider id',
+                                       example=14)
 provider_fields['name'] = fields.String(required=True,
                                         min_length=1, max_length=200,
-                                        description='Provider Name')
+                                        description='Provider Name',
+                                        example='Snakeoil Ltd')
 provider_fields['email'] = fields.String(required=True,
                                          example='email@mydomain.com',
                                          pattern=r'\S+@\S+\.\S+',
@@ -28,5 +35,14 @@ provider_fields['currency'] = fields.String(required=True,
                                             description='Currency,'
                                             ' choose one from'
                                             ' currency list')
+provider_fields['uri'] = fields.Url('providers_provider',
+                                    description='Provider URI')
 
-provider_marsh = api.model('Provider', provider_fields)
+# construct get marshaller from the fields
+provider_get_marsh = api.model('ProviderGet', provider_fields)
+
+# edit marshaller
+provider_edit_fields = deepcopy(provider_fields)
+del provider_edit_fields['id']
+del provider_edit_fields['uri']
+provider_edit_marsh = api.model('ProviderEdit', provider_edit_fields)

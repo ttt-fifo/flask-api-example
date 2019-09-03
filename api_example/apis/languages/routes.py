@@ -1,3 +1,6 @@
+"""
+Routes and views for the current endpoint
+"""
 from flask_restplus import Resource
 from flask import abort
 from .namespaces import api
@@ -15,7 +18,7 @@ class LanguageList(Resource):
         """
         Returns the list of languages
         """
-        return [lang for lang in language_mod.all()]
+        return language_mod.all()
 
 
 @api.route("/<string:code>")
@@ -26,8 +29,12 @@ class Language(Resource):
         """
         Displays the language detail
         """
+        # language codes are always lower in pycountry
         code = code.lower()
+
         lang = language_mod.one(code)
+
+        # abort if lang not found
         if not lang:
             abort(404, f"No such language: {code}")
         return lang

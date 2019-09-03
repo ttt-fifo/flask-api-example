@@ -1,3 +1,7 @@
+"""
+Routes for the current endpoint
+"""
+from flask import abort
 from flask_restplus import Resource
 from core.lib.validators import validate_with
 from .namespaces import api
@@ -27,7 +31,6 @@ class AreaList(Resource):
         """
         Adds a new area to the list
         """
-        api.payload['provider'] = int(api.payload['provider'].split('/')[-1])
         args = (api.payload['name'],
                 api.payload['price'],
                 api.payload['geom'],
@@ -43,7 +46,7 @@ class Area(Resource):
         """
         Displays the area details
         """
-        return area_mod.one(args=(id,))
+        return area_mod.one(id)
 
     @api.expect(area_edit_marsh, validate=True)
     @api.marshal_with(area_get_marsh)
@@ -52,7 +55,6 @@ class Area(Resource):
         """
         Edits the selected area
         """
-        api.payload['provider'] = int(api.payload['provider'].split('/')[-1])
         args = (api.payload['name'],
                 api.payload['price'],
                 api.payload['geom'],
@@ -60,13 +62,23 @@ class Area(Resource):
                 id)
         return area_mod.update(args)
 
+# NOTE: <float(signed=True):lat> construct does not work
+# TODO: check float after werkzeug update?
 
-@api.route("/<string:point>")
+
+@api.route("/<string:lat>/<string:lon>")
 class AreaPoint(Resource):
 
     @api.marshal_list_with(area_get_marsh)
-    def get(self, point):
+    def get(self, lat, lon):
         """
-        Queries Areas Where Point Resides
+        Queries areas by given latitude / longitude
         """
-        return area_mod.query_point(arg=(point,))
+        try:
+            lat = float(lat)
+            lon = float(lon)
+            point = f'POINT({lat} {lon})'
+            validators.point_validator(point)
+        except Exception as e:
+            abort(404, str(e))
+        return area_mod.query_point(point)

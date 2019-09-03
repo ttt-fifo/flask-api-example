@@ -1,3 +1,6 @@
+"""
+Routes and views for the current endpoint
+"""
 from flask_restplus import Resource
 from flask import abort
 from .namespaces import api
@@ -15,7 +18,7 @@ class CurrencyList(Resource):
         """
         Returns the list of currencies
         """
-        return [cur for cur in currency_mod.all()]
+        return currency_mod.all()
 
 
 @api.route("/<string:code>")
