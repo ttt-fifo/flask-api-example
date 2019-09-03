@@ -3,8 +3,7 @@ from core.lib.validators import validate_with
 from .namespaces import api
 from . import models
 from . import validators
-from .marshallers import provider_get_marsh
-from .marshallers import provider_edit_marsh
+from .marshallers import provider_marsh
 
 provider_mod = models.Provider()
 provider_val = validators.Provider()
@@ -13,15 +12,15 @@ provider_val = validators.Provider()
 @api.route("/")
 class ProviderList(Resource):
 
-    @api.marshal_list_with(provider_get_marsh)
+    @api.marshal_list_with(provider_marsh)
     def get(self):
         """
         Returns the list of providers
         """
         return [provider for provider in provider_mod.all()]
 
-    @api.expect(provider_edit_marsh, validate=True)
-    @api.marshal_with(provider_get_marsh)
+    @api.expect(provider_marsh, validate=True)
+    @api.marshal_with(provider_marsh)
     @validate_with(api, provider_val)
     def post(self):
         """
@@ -40,15 +39,15 @@ class ProviderList(Resource):
 @api.route("/<int:id>")
 class Provider(Resource):
 
-    @api.marshal_with(provider_get_marsh)
+    @api.marshal_with(provider_marsh)
     def get(self, id):
         """
         Displays the provider detail
         """
         return provider_mod.one(args=(id,))
 
-    @api.expect(provider_edit_marsh, validate=True)
-    @api.marshal_with(provider_get_marsh)
+    @api.expect(provider_marsh, validate=True)
+    @api.marshal_with(provider_marsh)
     @validate_with(api, provider_val)
     def put(self, id):
         """

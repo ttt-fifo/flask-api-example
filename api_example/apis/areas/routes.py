@@ -18,7 +18,7 @@ class AreaList(Resource):
         """
         Returns the list of areas
         """
-        return [ar for ar in area_mod.all()]
+        return area_mod.all()
 
     @api.expect(area_edit_marsh, validate=True)
     @api.marshal_with(area_get_marsh)
@@ -27,12 +27,12 @@ class AreaList(Resource):
         """
         Adds a new area to the list
         """
+        api.payload['provider'] = int(api.payload['provider'].split('/')[-1])
         args = (api.payload['name'],
                 api.payload['price'],
-                api.payload['geom'])
-        id = area_mod.insert(args)
-        api.payload['id'] = id
-        return api.payload
+                api.payload['geom'],
+                api.payload['provider'])
+        return area_mod.insert(args)
 
 
 @api.route("/<int:id>")
@@ -52,12 +52,21 @@ class Area(Resource):
         """
         Edits the selected area
         """
+        api.payload['provider'] = int(api.payload['provider'].split('/')[-1])
         args = (api.payload['name'],
-                api.payload['email'],
-                api.payload['phone'],
-                api.payload['language'],
-                api.payload['currency'],
+                api.payload['price'],
+                api.payload['geom'],
+                api.payload['provider'],
                 id)
-        area_mod.update(args)
-        api.payload['id'] = id
-        return api.payload
+        return area_mod.update(args)
+
+
+@api.route("/<string:point>")
+class AreaPoint(Resource):
+
+    @api.marshal_list_with(area_get_marsh)
+    def get(self, point):
+        """
+        Queries Areas Where Point Resides
+        """
+        return area_mod.query_point(arg=(point,))

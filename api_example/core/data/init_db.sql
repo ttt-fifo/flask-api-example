@@ -19,9 +19,11 @@ CREATE TABLE provider (
 );
 
 CREATE TABLE area (
-id INTEGER PRIMARY KEY,
-name TEXT,
-price REAL
+    id INTEGER PRIMARY KEY,
+    provider INTEGER,
+    name TEXT,
+    price REAL,
+    FOREIGN KEY(provider) REFERENCES provider(id)
 );
 SELECT load_extension("mod_spatialite.so");
 SELECT InitSpatialMetaData(1);
